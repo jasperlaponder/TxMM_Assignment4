@@ -49,11 +49,19 @@ y_train = traindf['author']
 
 svm = SVC().fit(X_train_scaled, y_train)
 
+X_dev = extract_features(devdf, count_vector, tf_idf_vector)
+X_dev_scaled = scale(X_dev)
+y_dev = devdf['author']
+
+y_pred_dev = svm.predict(X_dev_scaled)
+f1_dev = f1_score(y_dev, y_pred_dev, average='weighted')
+print(f'F1 Score on dev set: {f1_dev}')
+
 X_test = extract_features(testdf, count_vector, tf_idf_vector)
 X_test_scaled = scale(X_test)
 y_test = testdf['author']
 
-y_pred = svm.predict(X_test_scaled)
-f1 = f1_score(y_test, y_pred, average='weighted')
-print(f'F1 Score: {f1}')
+y_pred_test = svm.predict(X_test_scaled)
+f1 = f1_score(y_test, y_pred_test, average='weighted')
+print(f'F1 Score on test set: {f1}')
 print(f'With number of features: {X_train.shape[1]}')
