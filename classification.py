@@ -21,9 +21,12 @@ def avg_sent_len(text):
     sent_list = sent_tokenize(text)
     return sum(len(sent) for sent in sent_list)/len(sent_list)
 
-def character_counts(text_series):
+def extract_char_counts(text_series):
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     return text_series.apply(lambda text: [text.lower().count(c) for c in alphabet]).tolist()
+
+def extract_whitespace_counts(text_series):
+    return np.array(text_series.apply(lambda text: text.count(' ')))
 
 def scale(X):
     scaler = StandardScaler()
@@ -33,8 +36,9 @@ def extract_features(df, count_vectorizer, tfidf_vectorizer):
     count_vector = extract_count_vector(df['text'], count_vectorizer)
     tfidf_vector = extract_tfidf_vector(df['text'], tfidf_vectorizer)
     sent_len = df['text'].apply(avg_sent_len)
-    char_counts = character_counts(df['text'])
-    return np.hstack((count_vector, tfidf_vector, sent_len.values.reshape(-1, 1), char_counts))
+    char_counts = extract_char_counts(df['text'])
+    whitespace_counts = extract_whitespace_counts(df['text'])
+    return np.hstack((count_vector, tfidf_vector, sent_len.values.reshape(-1, 1), char_counts, whitespace_counts.reshape(-1, 1)))
 
 count_vector = CountVectorizer(max_features=50).fit(traindf['text'])
 tf_idf_vector = TfidfVectorizer(max_features=50).fit(traindf['text'])
@@ -53,4 +57,3 @@ y_pred = svm.predict(X_test_scaled)
 f1 = f1_score(y_test, y_pred, average='weighted')
 print(f'F1 Score: {f1}')
 print(f'With number of features: {X_train.shape[1]}')
-
