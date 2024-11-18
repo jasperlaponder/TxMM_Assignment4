@@ -35,7 +35,7 @@ def extract_pos_tag_freq(text):
     word_list = word_tokenize(text)
     pos_tags = [pos for (word, pos) in pos_tag(word_list)]
     fd = FreqDist(pos_tags)
-    tag_list = ['NN', 'NNP', 'DT', 'IN', 'JJ', 'NNS']
+    tag_list = ['ADJ', 'ADP', 'ADV', 'CONJ', 'DET', 'NOUN', 'NUM', 'PRT', 'PRON', 'VERB', '.', 'X']
     return np.array([fd[tag] / len(word_list) for tag in tag_list]).reshape(1, -1)
 
 def scale(X):
@@ -102,10 +102,10 @@ def ablation_study():
     f1_scores.append(train_and_evaluate(char_counts=False))
     f1_scores.append(train_and_evaluate(whitespace_counts=False))
     f1_scores.append(train_and_evaluate(pos_tag_counts=False))
-    return f1_scores
+    return np.asarray(f1_scores)
 
 labels = ['All Features', 'Count Vector', 'TF-IDF Vector', 'Sentence Length', 'Character Counts', 'Whitespace Counts', 'POS Tag Counts']
-plt.bar(labels, ablation_study())
+plt.bar(labels, ablation_study() - 0.6, bottom=0.6)
 plt.title('Ablation Study')
 plt.ylabel('F1 score')
 plt.show()
