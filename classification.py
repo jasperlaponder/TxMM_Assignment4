@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk import pos_tag
 from nltk import FreqDist
@@ -77,7 +77,13 @@ def train_and_evaluate(dev=True, count_vector_used=True, tfidf_vector_used=True,
 
         y_pred_dev = svm.predict(X_dev_scaled)
         f1_dev = f1_score(y_dev, y_pred_dev, average='weighted')
+        precision_dev = precision_score(y_dev, y_pred_dev, average='weighted')
+        recall_dev = recall_score(y_dev, y_pred_dev, average='weighted')
+        accuracy_dev = accuracy_score(y_dev, y_pred_dev)
         print(f"Evaluated on dev set with F1 score: {f1_dev}")
+        print(f"Evaluated on dev set with precision: {precision_dev}")
+        print(f"Evaluated on dev set with recall: {recall_dev}")
+        print(f"Evaluated on dev set with accuracy: {accuracy_dev}")
         print(f"Amount of features: {X_dev.shape[1]}")
         return(f1_dev)
 
@@ -89,7 +95,13 @@ def train_and_evaluate(dev=True, count_vector_used=True, tfidf_vector_used=True,
 
         y_pred_test = svm.predict(X_test_scaled)
         f1 = f1_score(y_test, y_pred_test, average='weighted')
+        precision = precision_score(y_test, y_pred_test, average='weighted')
+        recall = recall_score(y_test, y_pred_test, average='weighted')
+        accuracy = accuracy_score(y_test, y_pred_test)
         print(f"Evaluated on test set with F1 score: {f1}")
+        print(f"Evaluated on test set with precision: {precision}")
+        print(f"Evaluated on test set with recall: {recall}")
+        print(f"Evaluated on test set with accuracy: {accuracy}")
         print(f"Amount of features: {X_test.shape[1]}")
         return(f1)
 
@@ -104,8 +116,11 @@ def ablation_study():
     f1_scores.append(train_and_evaluate(pos_tag_counts=False))
     return np.asarray(f1_scores)
 
-labels = ['All Features', 'Count Vector', 'TF-IDF Vector', 'Sentence Length', 'Character Counts', 'Whitespace Counts', 'POS Tag Counts']
-plt.bar(labels, ablation_study() - 0.6, bottom=0.6)
-plt.title('Ablation Study')
-plt.ylabel('F1 score')
-plt.show()
+# labels = ['All Features', 'Count Vector', 'TF-IDF Vector', 'Sentence Length', 'Character Counts', 'Whitespace Counts', 'POS Tag Counts']
+# plt.bar(labels, ablation_study() - 0.6, bottom=0.6)
+# plt.title('Ablation Study')
+# plt.ylabel('F1 score')
+# plt.show()
+
+train_and_evaluate(tfidf_vector_used=False)
+train_and_evaluate(dev=False, tfidf_vector_used=False)
